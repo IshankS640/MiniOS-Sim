@@ -27,6 +27,5 @@ echo "Staging files and committing for date: $NEW_DATE"
 # Execute the backdated commit and push
 git add .
 GIT_AUTHOR_DATE="$NEW_DATE" GIT_COMMITTER_DATE="$NEW_DATE" git commit -m "$MESSAGE"
-git push origin main
 
-echo "✅ Push successful."
+echo "✅ Commit successful (push skipped)."
