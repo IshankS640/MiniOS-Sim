@@ -53,6 +53,7 @@ void Engine::run() {
                 if (p->phases.empty()) {
                     p->finish_time = now + 1;
                     --remaining_procs;
+                    sched_.on_finished(pid);
                 } else if (p->phases.front().kind == PhaseKind::CPU) {
                     p->remaining_burst = p->phases.front().arg;
                 }

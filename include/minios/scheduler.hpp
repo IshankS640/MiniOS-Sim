@@ -10,6 +10,7 @@ public:
     virtual void on_arrival(int pid) = 0;      // process just became ready
     virtual int pick_next(int now) = 0;        // which pid runs this tick? -1 = idle
     virtual void on_tick_end(int running_pid, int now) = 0; // housekeeping
+    virtual void on_finished(int /*pid*/) {} // default: no-op
     virtual bool ready_empty() const = 0;
 };
 
