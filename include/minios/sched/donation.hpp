@@ -36,6 +36,27 @@ public:
         return best;
     }
 
+    // Walk the chain: pid_waiting is blocked on lock_id, held by some owner.
+    // Push pid_waiting's effective priority down through however many locks
+    // it takes to reach the final holder. `owner_of_lock` and
+    // `waiting_lock_of` are small lookup functions you pass in so this class
+    // doesn't need to know about LockTable directly.
+    template <typename OwnerOfLockFn, typename WaitingLockOfFn>
+    void propagate_donation(int pid_waiting, int lock_id,
+                             OwnerOfLockFn owner_of_lock,
+                             WaitingLockOfFn waiting_lock_of) {
+        int donor_priority = effective(pid_waiting);
+        int current_lock = lock_id;
+        int guard = 0; // safety: chain length can never exceed number of pids
+        while (current_lock != -1 && guard++ < 10000) {
+            set_donor_for_lock(current_lock, donor_priority);
+            int owner = owner_of_lock(current_lock);
+            if (owner == -1) break;
+            int next_lock = waiting_lock_of(owner); // -1 if owner isn't blocked
+            current_lock = next_lock;
+        }
+    }
+
 private:
     std::unordered_map<int,int> base_;
     std::unordered_map<int, std::vector<int>> held_;
